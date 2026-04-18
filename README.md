@@ -8,3 +8,6 @@ Install dependencies and start the app:
 npm install
 npm start
 ```
+
+Expected output:
+`Project setup verified: Node.js app is running.`
