@@ -52,7 +52,7 @@ export function InsightPanel({ study }: Props) {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {activeTab === "insights" && (
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
