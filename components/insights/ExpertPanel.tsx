@@ -52,8 +52,8 @@ export function ExpertPanel({ studyId, text }: Props) {
         <div>
           <p className="text-sm font-medium text-white mb-1">Mode Expert PubMedBERT</p>
           <p className="text-xs text-neutral-500">
-            Extraction biomédicale via <span className="text-violet-400">d4data/biomedical-ner-all</span> (HuggingFace).
-            Identifie médicaments, maladies, gènes, protéines.
+            Extraction biomédicale par NER spécialisé PubMed.
+            Identifie médicaments, maladies, gènes, protéines, biomarqueurs.
           </p>
         </div>
         <Button onClick={run} className="bg-violet-600 hover:bg-violet-500 text-white text-xs h-8">
@@ -68,7 +68,7 @@ export function ExpertPanel({ studyId, text }: Props) {
       <div className="flex flex-col items-center justify-center gap-3 h-full">
         <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
         <p className="text-xs text-neutral-400">Modèle HuggingFace en cours…</p>
-        <p className="text-[11px] text-neutral-600">Peut prendre 15–30s au premier appel</p>
+        <p className="text-[11px] text-neutral-600">Extraction en cours (~3s)…</p>
       </div>
     );
   }

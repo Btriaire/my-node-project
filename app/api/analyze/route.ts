@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { groq, MODELS } from "@/lib/groq";
+import { groqWithFallback } from "@/lib/groq";
 
 const PERSONA = `Tu es un Senior Clinical Scientist avec 15 ans d'expérience en oncologie, biostatistiques et médecine translationnelle. Tu analyses des publications scientifiques avec rigueur, esprit critique et précision. Tu identifies systématiquement les forces et les limites méthodologiques sans qu'on te le demande.`;
 
@@ -11,16 +11,16 @@ export async function POST(req: NextRequest) {
     const truncated = text.slice(0, 12000);
 
     const [pitchRes, ktaRes, limitationsRes, entitiesRes] = await Promise.all([
-      groq.chat.completions.create({
-        model: MODELS.text,
+      groqWithFallback({
+        
         messages: [
           { role: "system", content: `${PERSONA} Génère un résumé "Pitch" de 3-4 phrases de cette étude, destiné à un directeur médical non-statisticien. Sois précis sur le design, la population et le résultat principal.` },
           { role: "user", content: truncated },
         ],
         max_tokens: 350,
       }),
-      groq.chat.completions.create({
-        model: MODELS.text,
+      groqWithFallback({
+        
         messages: [
           { role: "system", content: `${PERSONA} Extrais exactement 5 Key Takeaways critiques de cette étude. Inclus les chiffres clés (p-values, HR, CI, N). Réponds en JSON: {"takeaways": ["...", ...]}` },
           { role: "user", content: truncated },
@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
         max_tokens: 500,
         response_format: { type: "json_object" },
       }),
-      groq.chat.completions.create({
-        model: MODELS.text,
+      groqWithFallback({
+        
         messages: [
           { role: "system", content: `${PERSONA} Identifie 3 à 5 limites méthodologiques critiques de cette étude (p-values borderline, faible puissance statistique, biais de sélection, conflits d'intérêts, financement industriel, généralisation limitée, etc.). Sois direct et factuel. Réponds en JSON: {"limitations": ["...", ...]}` },
           { role: "user", content: truncated },
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
         max_tokens: 400,
         response_format: { type: "json_object" },
       }),
-      groq.chat.completions.create({
-        model: MODELS.text,
+      groqWithFallback({
+        
         messages: [
           { role: "system", content: `${PERSONA} Extrais les entités clés pour un graphe relationnel : molécules, cibles biologiques, maladies, endpoints, populations. Réponds en JSON: {"entities": [{"id": "e1", "label": "...", "type": "drug|target|disease|endpoint|population", "links": ["e2"]}]}` },
           { role: "user", content: truncated },
