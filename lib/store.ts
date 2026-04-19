@@ -32,9 +32,11 @@ interface AppState {
   activeStudy: StudyAnalysis | null;
   sidebarOpen: boolean;
   activeTab: "insights" | "chat" | "expert";
+  highlightKeyword: string;
   setActiveStudy: (study: StudyAnalysis | null) => void;
   toggleSidebar: () => void;
   setActiveTab: (tab: "insights" | "chat" | "expert") => void;
+  setHighlightKeyword: (keyword: string) => void;
   addStudy: (study: StudyAnalysis) => void;
   updateStudy: (id: string, patch: Partial<StudyAnalysis>) => void;
   addChatMessage: (studyId: string, message: ChatMessage) => void;
@@ -46,9 +48,11 @@ export const useAppStore = create<AppState>((set) => ({
   activeStudy: null,
   sidebarOpen: true,
   activeTab: "insights",
-  setActiveStudy: (study) => set({ activeStudy: study, activeTab: "insights" }),
+  highlightKeyword: "",
+  setActiveStudy: (study) => set({ activeStudy: study, activeTab: "insights", highlightKeyword: "" }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   setActiveTab: (tab) => set({ activeTab: tab }),
+  setHighlightKeyword: (keyword) => set({ highlightKeyword: keyword }),
   addStudy: (study) => set((s) => ({ studies: [study, ...s.studies] })),
   updateStudy: (id, patch) =>
     set((s) => ({

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAppStore, PubMedEntity } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, FlaskConical, AlertTriangle } from "lucide-react";
+import { Loader2, FlaskConical, AlertTriangle, Search, X } from "lucide-react";
 
 interface Props {
   studyId: string;
@@ -20,9 +20,10 @@ const TYPE_COLORS: Record<string, { bg: string; text: string; label: string }> =
 };
 
 export function ExpertPanel({ studyId, text }: Props) {
-  const { activeStudy, updateStudy } = useAppStore();
+  const { activeStudy, updateStudy, highlightKeyword, setHighlightKeyword } = useAppStore();
   const entities = activeStudy?.pubmedEntities;
   const status = activeStudy?.pubmedStatus ?? "idle";
+  const [inputValue, setInputValue] = useState("");
 
   const run = async () => {
     updateStudy(studyId, { pubmedStatus: "loading" });
@@ -85,6 +86,16 @@ export function ExpertPanel({ studyId, text }: Props) {
     );
   }
 
+  const applyKeyword = (kw: string) => {
+    setHighlightKeyword(kw);
+    setInputValue(kw);
+  };
+
+  const clearKeyword = () => {
+    setHighlightKeyword("");
+    setInputValue("");
+  };
+
   return (
     <div className="p-4 space-y-4 overflow-auto h-full">
       <div className="flex items-center justify-between">
@@ -96,6 +107,44 @@ export function ExpertPanel({ studyId, text }: Props) {
         </Button>
       </div>
 
+      {/* Keyword search */}
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+          Surligner dans le PDF
+        </p>
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-500" />
+            <input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && applyKeyword(inputValue)}
+              placeholder="Mot-clé ou clic sur entité…"
+              className="w-full h-7 pl-6 pr-2 text-[11px] bg-neutral-800 border border-neutral-700 rounded-md text-white placeholder:text-neutral-600 outline-none focus:border-violet-500"
+            />
+          </div>
+          {highlightKeyword ? (
+            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={clearKeyword}>
+              <X className="w-3 h-3" />
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-[11px] shrink-0 border-neutral-700"
+              onClick={() => applyKeyword(inputValue)}
+            >
+              OK
+            </Button>
+          )}
+        </div>
+        {highlightKeyword && (
+          <p className="text-[10px] text-amber-400">
+            Surligné : « {highlightKeyword} » — navigue dans le PDF pour voir les occurrences
+          </p>
+        )}
+      </div>
+
       {Object.entries(TYPE_COLORS).map(([type, style]) => {
         const group = grouped?.[type];
         if (!group?.length) return null;
@@ -105,12 +154,23 @@ export function ExpertPanel({ studyId, text }: Props) {
               {style.label} ({group.length})
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {group.map((e, i) => (
-                <Badge key={i} className={`${style.bg} ${style.text} border-0 text-[11px] font-normal`}>
-                  {e.text}
-                  <span className="ml-1 opacity-50">{Math.round(e.score * 100)}%</span>
-                </Badge>
-              ))}
+              {group.map((e, i) => {
+                const isActive = highlightKeyword.toLowerCase() === e.text.toLowerCase();
+                return (
+                  <Badge
+                    key={i}
+                    onClick={() => isActive ? clearKeyword() : applyKeyword(e.text)}
+                    className={`
+                      ${style.bg} ${style.text} border-0 text-[11px] font-normal cursor-pointer
+                      transition-all hover:opacity-80
+                      ${isActive ? "ring-1 ring-amber-400 ring-offset-1 ring-offset-neutral-900" : ""}
+                    `}
+                  >
+                    {e.text}
+                    <span className="ml-1 opacity-50">{Math.round(e.score * 100)}%</span>
+                  </Badge>
+                );
+              })}
             </div>
           </div>
         );

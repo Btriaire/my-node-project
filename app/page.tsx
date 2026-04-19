@@ -15,7 +15,7 @@ const PDFViewer = dynamic(
 );
 
 export default function Home() {
-  const { activeStudy, addStudy, updateStudy, setActiveStudy } = useAppStore();
+  const { activeStudy, addStudy, updateStudy, setActiveStudy, highlightKeyword } = useAppStore();
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -150,7 +150,7 @@ export default function Home() {
         ) : (
           <div className="flex-1 flex overflow-hidden">
             <div className="flex-1 overflow-hidden">
-              <PDFViewer url={activeStudy.storageUrl} />
+              <PDFViewer url={activeStudy.storageUrl} highlightKeyword={highlightKeyword} />
             </div>
             <div className="w-80 shrink-0 border-l border-neutral-800 overflow-hidden">
               <InsightPanel study={activeStudy} />

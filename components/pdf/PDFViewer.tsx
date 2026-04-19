@@ -11,10 +11,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 interface Props {
   url: string;
+  highlightKeyword?: string;
   onTextExtracted?: (text: string) => void;
 }
 
-export function PDFViewer({ url, onTextExtracted }: Props) {
+export function PDFViewer({ url, highlightKeyword, onTextExtracted }: Props) {
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1.2);
@@ -24,6 +25,19 @@ export function PDFViewer({ url, onTextExtracted }: Props) {
       setNumPages(numPages);
     },
     []
+  );
+
+  const customTextRenderer = useCallback(
+    ({ str }: { str: string }) => {
+      if (!highlightKeyword || highlightKeyword.trim().length < 2) return str;
+      const escaped = highlightKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${escaped})`, "gi");
+      return str.replace(
+        regex,
+        '<mark style="background:#f59e0b;color:#000;border-radius:2px;padding:0 1px">$1</mark>'
+      );
+    },
+    [highlightKeyword]
   );
 
   return (
@@ -88,6 +102,7 @@ export function PDFViewer({ url, onTextExtracted }: Props) {
             className="bg-white"
             renderTextLayer
             renderAnnotationLayer
+            customTextRenderer={customTextRenderer}
           />
         </Document>
       </div>
