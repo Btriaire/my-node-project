@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root {
+  --background: #080c14;
+  --surface: #0d1421;
+  --surface-elevated: #111927;
+  --border: #1e2d42;
+  --accent: #00d4ff;
+  --text-primary: #e8edf5;
+  --text-secondary: #6b7c96;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d1421; }
+::-webkit-scrollbar-thumb { background: #1e2d42; border-radius: 3px; }
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+.live-pulse {
+  animation: pulseGlow 1.8s ease-in-out infinite;
+}
